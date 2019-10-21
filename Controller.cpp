@@ -14,9 +14,9 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 	Vector2 posDif = enemyPos - tankPos;
 
 
-	std::cout << calculateVelocity(posDif.x, gravity, shotAngleRadians) << std::endl;
+	std::cout << posDif.y << std::endl;
 	// TODO: calculate the required shot speed (in pixels per second) and return it
-	return calculateVelocity(posDif.x, gravity, shotAngleRadians);// 700;
+	return calculateVelocity(posDif, gravity, shotAngleRadians, wind);// 700;
 }
 
 // Calculate the shot angle to hit the target, given the following information.
@@ -31,8 +31,37 @@ float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enem
 	return M_PI * 0.25f;
 }
 
-float Controller::calculateVelocity(float x_dif, float gravity, float angle)
+float Controller::calculateVelocity(const Vector2& dif, float gravity, float angle, float wind)
 {
-	return  sqrt(x_dif * gravity / sin((angle * 2.0f)));
+	
+	//find how high we are going to go.
+	float force = sqrt((dif.x) * gravity / sin(angle * 2.0f));
+	//force = sqrt((dif.x + (-wind * GetFlightLength(force, angle, gravity) )) * gravity / sin(angle * 2.0f));
+
+	std::cout << "flight Length " << GetFlightLength(force, angle, gravity) << std::endl;
+	std::cout << "wind " << (-wind * GetFlightLength(force, angle, gravity)) << std::endl;
+
+	Vector2 velocity = force * Vector2(cosf(angle), -sinf(angle));
+	velocity.x += (-wind * GetFlightLength(force, angle, gravity)); // GetFlightLength(force, angle, gravity);
+
+	std::cout << "flight Length X " << velocity.y << std::endl;
+
+	return  velocity.magnitude();
+
 }
 
+float Controller::WindCounterForce(float wind, float force)
+{
+
+	return 0.0f;
+
+}
+
+float Controller::GetFlightLength(float force, float angle, float gravity)
+{
+
+	Vector2 velocity = force * Vector2(cosf(angle), sinf(angle));
+	
+	return ( velocity.y / gravity ) * 2.0f;
+
+}
