@@ -9,8 +9,9 @@
 //   wind: the acceleration due to wind in pixels/second^2 (positive is rightwards)
 float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enemyPos, float shotAngleRadians, float gravity, float wind)
 {
-	// TODO: calculate the required shot speed (in pixels per second) and return it
-	return 700;
+	float distance = abs( tankPos.x - enemyPos.x );
+
+	return sqrt( (distance*gravity) / sin((2*shotAngleRadians))    );
 }
 
 // Calculate the shot angle to hit the target, given the following information.
