@@ -10,12 +10,10 @@
 //   wind: the acceleration due to wind in pixels/second^2 (positive is rightwards)
 float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enemyPos, float shotAngleRadians, float gravity, float wind)
 {
-	// TODO: calculate the required shot speed (in pixels per second) and return it
-
 	Vector2 displacement = enemyPos - tankPos;
 
 	float rotation = atan2(wind, gravity);
-	float newGravity = sqrt((pow(abs(wind), 2) + pow(abs(gravity), 2)));
+	float newGravity = sqrt((pow(wind, 2) + pow(gravity, 2)));
 
 
 	Vector2 rotatDisplac = Vector2();
@@ -35,7 +33,10 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 //   wind: the acceleration due to wind in pixels/second^2 (positive is rightwards)
 float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enemyPos, float shotSpeed, float gravity, float wind)
 {
-	// TODO: calculate the required shot angle (in radians) and return it
-	return M_PI * 0.25f;
+	Vector2 displacement = enemyPos - tankPos;
+
+	float angle = 0.5f * asin((displacement.x * gravity) / (pow(shotSpeed, 2))); // works for flat only
+
+	return angle;
 }
 
