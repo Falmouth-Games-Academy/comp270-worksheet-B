@@ -13,7 +13,7 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 	// TODO: calculate the required shot speed (in pixels per second) and return it
 
 	Vector2 displacement = enemyPos - tankPos;
-	float shotSpeed = sqrt((displacement.x * gravity)/(sin(2*shotAngleRadians)));
+	float shotSpeed = sqrt(((gravity * pow(displacement.x, 2))/(sin(2 * shotAngleRadians)))/(displacement.x + (displacement.y * 1/(tan(shotAngleRadians)))));   // this is horrible to look at
 	return shotSpeed;
 }
 
