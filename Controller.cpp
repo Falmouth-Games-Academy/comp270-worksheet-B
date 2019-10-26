@@ -28,15 +28,14 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enemyPos, float shotSpeed, float gravity, float wind)
 {
 	// im at a total loss with this.
-	float x_d = enemyPos.x - tankPos.x;
-	float x_dif = sqrtf(x_d * x_d);
+	float x_dif = enemyPos.x - tankPos.x;
 	float y_dif = -(enemyPos.y - tankPos.y);
 
 	float feta = powf(shotSpeed, 4.0f) - gravity * (gravity * x_dif * x_dif + 2.0f * y_dif * powf(shotSpeed, 2.0f));
 	
 	feta = sqrtf(feta);
 
-	feta = atan2f(powf(shotSpeed, 2.0f) + feta, gravity*x_dif);
+	feta = atan2f(powf(shotSpeed, 2.0f) + feta, gravity*x_dif);		// this can be +/- feta; - is more direct while + goes really high :D
 
 	return feta;
 }
