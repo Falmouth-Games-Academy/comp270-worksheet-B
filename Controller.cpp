@@ -32,18 +32,11 @@ float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enem
 	float x_dif = sqrtf(x_d * x_d);
 	float y_dif = -(enemyPos.y - tankPos.y);
 
-	std::cout << "xd " << x_d << " || " << x_dif << std::endl;
-
 	float feta = powf(shotSpeed, 4.0f) - gravity * (gravity * x_dif * x_dif + 2.0f * y_dif * powf(shotSpeed, 2.0f));
 	
-	std::cout << " aa " << gravity * x_dif << " || " << feta << std::endl;
-
 	feta = sqrtf(feta);
 
 	feta = atan2f(powf(shotSpeed, 2.0f) + feta, gravity*x_dif);
-
-	std::cout << feta << " || " <<  feta*M_PI << " || " <<(feta * (180.0f/M_PI)) <<std::endl;
-
 
 	return feta;
 }
