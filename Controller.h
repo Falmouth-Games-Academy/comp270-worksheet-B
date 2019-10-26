@@ -10,11 +10,11 @@ public:
 
 	float calculateVelocity(const Vector2& x_dif, float gravity, float angle, float wind);
 	float WindCounterForce(float wind, float force);
-	float GetFlightLength(float force, float angle, float gravity);
+	float GetFlightLength(float heightDif, float force, float angle, float gravity);
 
-	const float c_canHandleHeightDifference = false;// false;
-	const float c_canHandleWind = true;
-	const float c_doCalculateAngle = false;
+	const float c_canHandleHeightDifference = true;// true;// false;
+	const float c_canHandleWind = false;
+	const float c_doCalculateAngle = true;
 
 	
 };

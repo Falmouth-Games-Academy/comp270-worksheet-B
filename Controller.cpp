@@ -27,26 +27,62 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 //   wind: the acceleration due to wind in pixels/second^2 (positive is rightwards)
 float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enemyPos, float shotSpeed, float gravity, float wind)
 {
-	// TODO: calculate the required shot angle (in radians) and return it
-	return M_PI * 0.25f;
+	// im at a total loss with this.
+	float x_d = enemyPos.x - tankPos.x;
+	float x_dif = sqrtf(x_d * x_d);
+	float y_dif = -(enemyPos.y - tankPos.y);
+
+	std::cout << "xd " << x_d << " || " << x_dif << std::endl;
+
+	float feta = powf(shotSpeed, 4.0f) - gravity * (gravity * x_dif * x_dif + 2.0f * y_dif * powf(shotSpeed, 2.0f));
+	
+	std::cout << " aa " << gravity * x_dif << " || " << feta << std::endl;
+
+	feta = sqrtf(feta);
+
+	feta = atan2f(powf(shotSpeed, 2.0f) + feta, gravity*x_dif);
+
+	std::cout << feta << " || " <<  feta*M_PI << " || " <<(feta * (180.0f/M_PI)) <<std::endl;
+
+
+	return feta;
 }
 
 float Controller::calculateVelocity(const Vector2& dif, float gravity, float angle, float wind)
 {
 	
-	//find how high we are going to go.
-	float force = sqrt((dif.x) * gravity / sin(angle * 2.0f));
-	//force = sqrt((dif.x + (-wind * GetFlightLength(force, angle, gravity) )) * gravity / sin(angle * 2.0f));
+	//caculate the inital force.
+	float force = (dif.x) * gravity / sinf(angle * 2.0f);
+	Vector2 force_vect2 = force * Vector2(cosf(angle), -sinf(angle));
+	
+	force -= (-dif.y + ((force_vect2.y/gravity)*force_vect2.y)) / (gravity) * ( sinf(angle * 2.0f) ) ;
 
-	std::cout << "flight Length " << GetFlightLength(force, angle, gravity) << std::endl;
-	std::cout << "wind " << (-wind * GetFlightLength(force, angle, gravity)) << std::endl;
+	force = sqrtf(force);
 
-	Vector2 velocity = force * Vector2(cosf(angle), -sinf(angle));
-	velocity.x += (-wind * GetFlightLength(force, angle, gravity)); // GetFlightLength(force, angle, gravity);
+	std::cout << (dif.y) << " * "<< (1.0f / tanf(angle * 2.0f)) << " == " << force << std::endl;
 
-	std::cout << "flight Length X " << velocity.y << std::endl;
+	/*
+	std::cout << (dif.x) * -wind / cos(angle * 2.0f) << std::endl;
 
-	return  velocity.magnitude();
+	//float force = sqrt( (gravity * pow(dif.x, 2.0f)) / sin(angle * 2.0f) / (dif.x+dif.y * (1.0f/tan(angle))));
+	Vector2 force_vect2 = force * Vector2(cosf(angle), -sinf(angle));
+
+	std::cout << "force / grav " << force_vect2.y << "/"<<gravity << "||" << (force_vect2.y * GetFlightLength(dif.y, force, angle, gravity)) <<"||" << (force_vect2.x * GetFlightLength(dif.y, force, angle, gravity)) << "=="<< dif.x << std::endl;
+	std::cout << "flight Length " << GetFlightLength(dif.y, force, angle, gravity) << std::endl;
+	std::cout << "wind " << (-wind * GetFlightLength(dif.y, force, angle, gravity)) << std::endl;
+	std::cout << "x" << force_vect2.x << " (finalVel) s " << (0.5f * (force_vect2.x + (force_vect2.x - (-wind * GetFlightLength(dif.y, force, angle, gravity)))) ) << std::endl;
+	std::cout << "x" << force_vect2.x << " (finalVel) s " << ( force_vect2.x - (0.5f * wind * pow(1.0f, 2)) ) << std::endl;
+	std::cout << "height dif " << dif.y << " x dif: "<< dif.x << " gravity " << gravity << " angle " << angle << std::endl;
+	std::cout << "force" << force << "fv.x: "<< force_vect2.x << "fv.y: " << force_vect2 .y << std::endl;
+	*/
+	//Vector2 velocity = force_vect2;
+	//float flightLength = GetFlightLength(dif.y, force, angle, gravity);
+
+	//velocity.x = (dif.x * flightLength);
+
+	//std::cout << "flight Length X " << velocity.y << std::endl;
+
+	return  force;// velocity.magnitude();
 
 }
 
@@ -57,11 +93,13 @@ float Controller::WindCounterForce(float wind, float force)
 
 }
 
-float Controller::GetFlightLength(float force, float angle, float gravity)
+float Controller::GetFlightLength(float heightDif, float force, float angle, float gravity)
 {
 
 	Vector2 velocity = force * Vector2(cosf(angle), sinf(angle));
 	
-	return ( velocity.y / gravity ) * 2.0f;
+	float fall_len = 1 - ( -heightDif / ( (velocity.y / gravity) * velocity.y ) );
+
+	return ( velocity.y / gravity ) * (1 + fall_len);
 
 }
