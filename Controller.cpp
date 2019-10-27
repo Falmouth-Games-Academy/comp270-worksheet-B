@@ -31,26 +31,53 @@ float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enem
 	float x_dif = enemyPos.x - tankPos.x;
 	float y_dif = -(enemyPos.y - tankPos.y);
 
-	//finde angle
+	//find angle
 	float feta = powf(shotSpeed, 4.0f) - gravity * (gravity * x_dif * x_dif + 2.0f * y_dif * powf(shotSpeed, 2.0f));
 	feta = sqrtf(feta);
-	feta = atan2f(powf(shotSpeed, 2.0f) + feta, gravity*x_dif);		// this can be +/- feta; - is more direct while + goes really high :D
-
-	return feta;
+	float rad = atan2f(powf(shotSpeed, 2.0f) + feta, gravity*x_dif);		// this can be +/- feta; '-' is more direct while '+' goes really high :D
+																			// if both + and - give the same answser then it is the lowest possible
+																			// velocity that can be applied to hit the target.
+	return rad;
 }
 
 float Controller::calculateVelocity(const Vector2& dif, float gravity, float angle, float wind)
 {
-	
+
 	//caculate the inital force.
-	float force = (dif.x) * gravity / sinf(angle * 2.0f);
-	Vector2 force_vect2 = force * Vector2(cosf(angle), -sinf(angle));
-	
-	force -= (-dif.y + ((force_vect2.y/gravity)*force_vect2.y)) / (gravity) * ( sinf(angle * 2.0f) ) ;
+	//float force = dif.x * gravity / sinf(angle * 2.0f);	// good flat (correct)
+  //float force = (dif.x + (dif.x * (-dif.y / dif.x))) * gravity / sinf(angle * 2.0f);
+  //float force = (dif.x + (dif.x * tanf(-dif.y / dif.x) )) * gravity / sinf(angle * 2.0f);	// a lil closer? (higher hit rate)
+  //float force = (dif.x + (dif.x * (sinf(-dif.y / dif.x) * sinf(angle*2.f)) )) * gravity / sinf(angle * 2.0f); // (higher hit rate)
+  //float force = (dif.x + (dif.x * (tanf(-dif.y / dif.x) * sinf(angle*2.f)) )) * gravity / sinf(angle * 2.0f); // (higher hit rate)
+	//float force = (dif.x + ((dif.x/gravity) * ((tanf(dif.y / dif.x) * sinf(angle*2.0f))) )) * gravity / sinf(angle * 2.0f); // 
+	//float force = (powf(dif.x, 2.0f) * gravity) / ( dif.x * sinf(angle * 2.f) ) - ( 2.f * -dif.y *  powf(cosf( angle ), 2.f) );
+	float force = (dif.x * dif.x * gravity) /  (dif.x * sinf(angle * 2.f)  -  2.f * -dif.y * cosf( angle ) * cosf(angle) );
+	//float force = (dif.x + (dif.x * -sinf(dif.y / dif.x))) * gravity / sinf(angle * 2.0f);
+	//force -= (-dif.y / dif.x) * powf((0.5f * gravity), 2.0f) / tanf(angle * 2.f);
+
+	//force -= (-powf(dif.y, 2.0f)) / powf((0.5f * gravity), 2.0f) * tanf(angle * 2.f);
+
+	float w_force = 0;// -wind * cosf((-wind / (dif.x)) * 2.f); ;// dif.x * (-wind / gravity) / sinf(angle * 2.0f);
+
+	force += w_force;
+
+	std::cout << "wind: " << wind << " w_wind " << w_force << " x: " << (w_force * cosf(angle)) << " y: " << (w_force * -sinf(angle)) << " w/g " << (-wind / gravity) << " || " << ((-wind * (-wind / (gravity)))) << std::endl;
+	std::cout << "force: " << force << " x: " << (force * cosf(angle)) << " y: " << (force * -sinf(angle)) << std::endl;
+
+
 
 	force = sqrtf(force);
 
-	std::cout << (dif.y) << " * "<< (1.0f / tanf(angle * 2.0f)) << " == " << force << std::endl;
+	Vector2 force_vect2 = force * Vector2(cosf(angle), -sinf(angle));
+	float flightLength = GetFlightLength(dif.y, force, angle, gravity);
+
+	//force -= (-dif.y + ((force_vect2.y/gravity)*force_vect2.y)) / (gravity) * ( sinf(angle * 2.0f) ) ;
+	//force += ((2.0f * dif.y) + ((force_vect2.y/gravity)*force_vect2.y)) / (gravity) * ( sinf(angle * 2.0f) ) ;
+	//force += (dif.y + (-force_vect2.y * flightLength));
+
+	std::cout << -dif.y << " * " << gravity << " / " << sinf(angle * 2.f) << std::endl;
+
+	std::cout << (flightLength) << " || " << force << std::endl;
 
 	/*
 	std::cout << (dif.x) * -wind / cos(angle * 2.0f) << std::endl;
@@ -89,8 +116,8 @@ float Controller::GetFlightLength(float heightDif, float force, float angle, flo
 
 	Vector2 velocity = force * Vector2(cosf(angle), sinf(angle));
 	
-	float fall_len = 1 - ( -heightDif / ( (velocity.y / gravity) * velocity.y ) );
+	// float fall_len = 1 - (-heightDif / ((velocity.y / gravity) * velocity.y));
 
-	return ( velocity.y / gravity ) * (1 + fall_len);
+	return (velocity.y / gravity) * 2.0f;// *(1 + fall_len);
 
 }
