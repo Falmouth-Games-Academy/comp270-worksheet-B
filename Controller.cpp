@@ -12,16 +12,17 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 {
 	Vector2 displacement = enemyPos - tankPos;
 
-	float rotation = atan2(wind, gravity);
-	float newGravity = sqrt((pow(wind, 2) + pow(gravity, 2)));
+	float aaaaaangle = atanf(wind / gravity);
+	float graaaavity = sqrt(pow(wind, 2) + pow(gravity, 2));
 
-
-	Vector2 rotatDisplac = Vector2();
-	rotatDisplac.x = (displacement.x * cos(rotation)) + (displacement.y * sin(rotation));
-	rotatDisplac.y = (displacement.y * cos(rotation)) - (displacement.x * sin(rotation));
-
-
-	float shotSpeed = sqrt(((newGravity * pow(rotatDisplac.x, 2)) / (sin(2 * shotAngleRadians))) / (rotatDisplac.x + (rotatDisplac.y * 1 / (tan(shotAngleRadians)))));   // this is horrible to look at
+	Vector2 displaaaaac = Vector2();
+	displaaaaac.x = (displacement.x * cos(aaaaaangle)) - (displacement.y * sin(aaaaaangle));
+	displaaaaac.y = (displacement.y * cos(aaaaaangle)) + (displacement.x * sin(aaaaaangle));
+	
+	float num = graaaavity * pow(displaaaaac.x, 2);
+	float den = ((displaaaaac.x * tan(shotAngleRadians - aaaaaangle)) + displaaaaac.y) * (pow(cos(shotAngleRadians - aaaaaangle),2));
+	
+	float shotSpeed = sqrt(0.5 * (num/den));
 	return shotSpeed;
 }
 
@@ -34,8 +35,14 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enemyPos, float shotSpeed, float gravity, float wind)
 {
 	Vector2 displacement = enemyPos - tankPos;
+	float aaaaaangle = atanf(wind / gravity);
+	float graaaavity = sqrt(pow(wind, 2) + pow(gravity, 2));
 
-	float angle = 0.5f * asin((displacement.x * gravity) / (pow(shotSpeed, 2))); // works for flat only
+	Vector2 displac = Vector2();
+	displac.x = (displacement.x * cos(aaaaaangle)) - (displacement.y * sin(aaaaaangle));
+	displac.y = (displacement.y * cos(aaaaaangle)) + (displacement.x * sin(aaaaaangle)); 
+
+	float angle = aaaaaangle + atan(((pow(shotSpeed, 2)) + (sqrt(pow(shotSpeed, 4) - graaaavity * ((graaaavity*pow(displac.x, 2)) + (2 * -displac.y*pow(shotSpeed, 2)))))) / (graaaavity*displac.x));
 
 	return angle;
 }
