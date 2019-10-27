@@ -12,8 +12,8 @@ public:
 	float WindCounterForce(float wind, float force);
 	float GetFlightLength(float heightDif, float force, float angle, float gravity);
 
-	const float c_canHandleHeightDifference = true;;;;;;;;;// true;// false;
-	const float c_canHandleWind = false;;;
+	const float c_canHandleHeightDifference = false;;;;;;;;;// true;// false;
+	const float c_canHandleWind = true;
 	const float c_doCalculateAngle = false;
 
 	

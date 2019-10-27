@@ -40,16 +40,18 @@ float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enem
 	return rad;
 }
 
-float Controller::calculateVelocity(const Vector2& dif, float gravity, float angle, float wind)
+float Controller::calculateVelocity(const Vector2& diff, float gravity, float angle, float wind)
 {
+
+	Vector2 dif = diff;
+	dif.x += -wind;
 
 	//caculate the inital force.
 	float force = (dif.x * dif.x * gravity) /  (dif.x * sinf(angle * 2.f)  -  2.f * -dif.y * cosf( angle ) * cosf(angle) );
 
-	float w_force = 0;
-	force += w_force;
-
 	force = sqrtf(force);
+
+	std::cout << " ## " << force << std::endl;
 
 	return  force;
 
