@@ -13,31 +13,30 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 	
 	// TASK 1
 	// return sqrt((gravity * (enemyPos.x - tankPos.x)) / (sin(2 * shotAngleRadians)));
-	// Used formula from the session: u = sqrt(x * g / sin(2* phi))
 
 	// TASK 2
-	return sqrt((gravity * pow(enemyPos.x - tankPos.x, 2) / ((sin(2 * shotAngleRadians) * ((enemyPos.x - tankPos.x) - (-(enemyPos.y - tankPos.y) * (cos(shotAngleRadians) / sin(shotAngleRadians))))))));
-	// Used formula s = u * t + 1/2 * a * t^2
-	// And split into separate equations using x components and y components
-	// Considering u = (u * cos phi | u * sin phi) and a = (0 | gravity) we have:
-	// x = u * t * cos phi => t = x / u * cos phi
-	// y = u * t * sin phi + 1/2 * gravity * t^2
-	// Solving for u, we have:
-	// u = sqrt(gravity * x^2 / sin(2 * phi) * (x - y * cotan(phi))
+	// return sqrt((gravity * pow(enemyPos.x - tankPos.x, 2) / ((sin(2 * shotAngleRadians) * ((enemyPos.x - tankPos.x) - (-(enemyPos.y - tankPos.y) * (cos(shotAngleRadians) / sin(shotAngleRadians))))))));
 
-	// TASK 3 - NEEDS REWORK
-	//Vector2 s = enemyPos - tankPos;
+	// TASK 3
+	// Time for a fresh approach - Displacing and rotating the 'world' so that the acceleration will be one dimensional - this will require us to rotate our vectors (apart from acceleration)
+	Vector2 s = enemyPos - tankPos;
 
-	//float w = wind;
-	//float g = gravity;
-	//float x = s.x;
-	//float y = s.y;
-	//float alpha = g * x + w * y;
-	//float beta = w * sin(shotAngleRadians) + g * cos(shotAngleRadians);
-	//float f = alpha / beta;
+	// Calculate angle between new gravity and initial gravity
+	float _angle = atan(wind / gravity);
 
-	//return f * sqrt(w / (2 * (x - (cos(shotAngleRadians)*f))));
+	// Calculate magnitude of new gravity
+	float _gravity = sqrt(pow(gravity, 2) + pow(wind, 2));
 
+	// Adjusted displacement
+	Vector2 _s = Vector2(
+		(s.x * cos(_angle)) - (s.y * sin(_angle)),
+		(s.x * sin(_angle)) + (s.y * cos(_angle))
+	);
+
+	return sqrt( 0.5 *
+		((_gravity * pow(_s.x, 2)) /
+		((_s.x * tan(shotAngleRadians - _angle) + _s.y) * (pow(cos(shotAngleRadians - _angle), 2))))
+	);
 }
 
 // Calculate the shot angle to hit the target, given the following information.
@@ -48,7 +47,15 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 //   wind: the acceleration due to wind in pixels/second^2 (positive is rightwards)
 float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enemyPos, float shotSpeed, float gravity, float wind)
 {
-	// TODO: calculate the required shot angle (in radians) and return it
-	return M_PI * 0.25f;
+	Vector2 s = enemyPos - tankPos;
+	float x = s.x;
+	float y = s.y;
+	float g = gravity;
+	float u = shotSpeed;
+
+	return atan(
+		(-x + sqrt(pow(x,2)-8*g*pow(x/u,2)*(1-y)))/
+		(2*g*pow(x/u,2)*(1-y))
+	);
 }
 
