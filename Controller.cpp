@@ -19,7 +19,7 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 
 	Vector2 displaaaaac = Vector2();
 	displaaaaac.x = (displacement.x * cos(aaaaaangle)) - (displacement.y * sin(aaaaaangle)); // calculating X distance in new co-ord plane where graaaavity is directly downwards (y +ve)
-	displaaaaac.y = (displacement.y * cos(aaaaaangle)) + (displacement.x * sin(aaaaaangle)); // calculating X distance in new co - ord plane
+	displaaaaac.y = (displacement.y * cos(aaaaaangle)) + (displacement.x * sin(aaaaaangle)); // calculating Y distance in new co - ord plane
 	
 	float num = graaaavity * pow(displaaaaac.x, 2); // caluclating numerator of big equation, to make this all a tiny bit tidier
 	float den = ((displaaaaac.x * tan(shotAngleRadians - aaaaaangle)) + displaaaaac.y) * (pow(cos(shotAngleRadians - aaaaaangle),2)); // calculating denominator
@@ -42,7 +42,7 @@ float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enem
 
 	Vector2 displac = Vector2();
 	displac.x = (displacement.x * cos(aaaaaangle)) - (displacement.y * sin(aaaaaangle)); // calculating X distance in new co-ord plane where graaaavity is directly downwards (y +ve)
-	displac.y = (displacement.y * cos(aaaaaangle)) + (displacement.x * sin(aaaaaangle)); // calculating X distance in new co - ord plane
+	displac.y = (displacement.y * cos(aaaaaangle)) + (displacement.x * sin(aaaaaangle)); // calculating Y distance in new co - ord plane
 
 	float angle = aaaaaangle + atan(
 							((pow(shotSpeed, 2)) + 
