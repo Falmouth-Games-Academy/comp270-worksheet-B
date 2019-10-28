@@ -10,7 +10,17 @@
 float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enemyPos, float shotAngleRadians, float gravity, float wind)
 {
 	// TODO: calculate the required shot speed (in pixels per second) and return it
-	return 700;
+	float inclineAngle = atanf(wind / gravity);
+	Vector2 distanceBetweenTanks = enemyPos - tankPos;
+	Vector2 windPosition = Vector2();
+	windPosition.x = (distanceBetweenTanks.x * cos(inclineAngle)) - (distanceBetweenTanks.y * sin(inclineAngle));
+	windPosition.y = (distanceBetweenTanks.y * cos(inclineAngle)) + (distanceBetweenTanks.x * sin(inclineAngle));
+
+	float angledGravity = sqrt(pow(wind, 2) + pow(gravity, 2));
+	float newAngle = shotAngleRadians - inclineAngle;
+	float shotSpeed = sqrt((angledGravity * pow(windPosition.x, 2)) / ((windPosition.x * sin(2 * newAngle)) + windPosition.y * (cos(2 * newAngle ) + 1 )));
+	
+ 	return shotSpeed;
 }
 
 // Calculate the shot angle to hit the target, given the following information.
