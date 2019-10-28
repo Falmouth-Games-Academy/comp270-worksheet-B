@@ -18,16 +18,14 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 	// return sqrt((gravity * pow(enemyPos.x - tankPos.x, 2) / ((sin(2 * shotAngleRadians) * ((enemyPos.x - tankPos.x) - (-(enemyPos.y - tankPos.y) * (cos(shotAngleRadians) / sin(shotAngleRadians))))))));
 
 	// TASK 3
-	Vector2 s = enemyPos - tankPos;
-	float x = s.x;
-	float y = -s.y;
-	float g = gravity;
-	float w = wind;
-	float alpha = (g * x + w * y) / (g * cos(shotAngleRadians) + w * sin(shotAngleRadians));
-	float u = alpha * sqrt((w) / (2 * (x - cos(shotAngleRadians) * alpha)));
-	return u;
+	Vector2 _displacement = enemyPos - tankPos;
+	// Calculate an intermediary for easier writing
+	float alpha = (gravity * _displacement.x + wind * (-_displacement.y)) / (gravity * cos(shotAngleRadians) + wind * sin(shotAngleRadians));
+	float shotSpeed = alpha * sqrt(abs((wind) / (2 * (_displacement.x - cos(shotAngleRadians) * alpha))));
 
+	// Note: it has been observed that the square root can return null values 
 
+	return shotSpeed;
 }
 
 // Calculate the shot angle to hit the target, given the following information.
@@ -38,15 +36,12 @@ float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enem
 //   wind: the acceleration due to wind in pixels/second^2 (positive is rightwards)
 float Controller::calculateShotAngle(const Vector2& tankPos, const Vector2& enemyPos, float shotSpeed, float gravity, float wind)
 {
-	Vector2 s = enemyPos - tankPos;
-	float x = s.x;
-	float y = s.y;
-	float g = gravity;
-	float u = shotSpeed;
+	Vector2 _displacement = enemyPos - tankPos;
 
-	float a = (g * pow(x,2)) / (2*pow(u,2));
-	float b = -x;
-	float c = (a + y);
+	// Solve for tangent of angle in a quadratic formula - using mathematic notations for these variables to ease writing
+	float a = (gravity * pow(_displacement.x,2) + wind * pow(-_displacement.y, 2)) / (2*pow(shotSpeed,2));
+	float b = -_displacement.x;
+	float c = (a - _displacement.y);
 
 	return atan((-b + sqrt(pow(b, 2) - 4 * a * c)) / (2 * a));
 }
