@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "Controller.h"
+#include <math.h> 
+
 
 // Calculate the shot speed to hit the target, given the following information.
 //   tankPos: the position from which the bullet will be fired, in pixels relative to the top left corner of the screen
@@ -10,7 +12,8 @@
 float Controller::calculateShotSpeed(const Vector2& tankPos, const Vector2& enemyPos, float shotAngleRadians, float gravity, float wind)
 {
 	// TODO: calculate the required shot speed (in pixels per second) and return it
-	return 700;
+	Vector2 displacement = tankPos - enemyPos; //easyer if I just did the displacement here instead of witing it evey time
+	return sqrt(((gravity * pow(displacement.x, 2)) / (sin(2 * shotAngleRadians / (displacement.x + (displacement.y * 1 / (tan(shotAngleRadians))))))));
 }
 
 // Calculate the shot angle to hit the target, given the following information.
